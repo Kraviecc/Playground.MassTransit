@@ -1,5 +1,6 @@
 using ConsumerWorkerMassTransit;
 using MassTransit;
+using RabbitMQ.Client;
 
 IHost host = Host.CreateDefaultBuilder(args)
    .ConfigureServices(
@@ -13,12 +14,22 @@ IHost host = Host.CreateDefaultBuilder(args)
 					x.UsingRabbitMq(
 						(context, cfg) =>
 						{
-							cfg.ReceiveEndpoint("testexchange",
+							cfg.ReceiveEndpoint("testexchange222",
 								e =>
 								{
-									e.Bind("testexchange");
+									e.ConfigureConsumeTopology = false;
+									
+									e.Bind("testexchange2",
+										config =>
+										{
+											config.ExchangeType = ExchangeType.Direct;
+											config.Durable = true;
+											config.AutoDelete = false;
+											config.RoutingKey = "urn:message:EventContracts:TestValue";
+										});
 									e.ConfigureConsumer<TestExchangeConsumer>(context);
 								});
+							
 							cfg.ConfigureEndpoints(context);
 						});
 				});

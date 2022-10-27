@@ -24,8 +24,8 @@ public class Worker : BackgroundService
 		using var channel = connection.CreateModel();
 
 		channel.ExchangeDeclare(
-			"testexchange",
-			ExchangeType.Fanout,
+			"testexchange2",
+			ExchangeType.Direct,
 			true);
 
 		while (!stoppingToken.IsCancellationRequested)
@@ -37,8 +37,8 @@ public class Worker : BackgroundService
 			var body = Encoding.UTF8.GetBytes(json);
 
 			channel.BasicPublish(
-				"testexchange",
-				"",
+				"testexchange2",
+				"urn:message:EventContracts:TestValue",
 				body:body);
 		}
 	}
